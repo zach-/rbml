@@ -1,0 +1,5 @@
+	HALT
+	SDF
+	HERR
+	COMP A
+	COMP r0, r1, r2

@@ -1,0 +1,9 @@
+*.rbml
+*.o
+*.d
+src/rbml
+src/rbmlc
+src/rbmlc-mpc
+src/rbml_parser.c
+src/rbml_parser.h
+src/rbml_lex.c

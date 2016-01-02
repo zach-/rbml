@@ -1,0 +1,913 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+  \newcommand{\euro}{€}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage{hyperref}
+\PassOptionsToPackage{usenames,dvipsnames}{color} % color is loaded by hyperref
+\hypersetup{unicode=true,
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{longtable,booktabs}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+\date{}
+
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+\begin{document}
+
+\begin{longtable}[c]{@{}llllll@{}}
+\toprule
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{Instruction}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{OP}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{ARG1}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{ARG2}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{ARG3}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{DESC}
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CRDR}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{B1}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register to be written to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Controls read mode (0 for numeric, other for ASCII)
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Read a word from the console into a register
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{WRIT}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{B4}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Controls write mode (0 for numeric, other for ASCII)
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register to be written from
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Write a word from a register to the console
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{FRDR}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{B8}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+File to be read from
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register to be written to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Read a word from a disk to a register
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{FWRT}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{BB}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+File to be written to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register to be read from
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Write a word from a register to a disk
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{REPO}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{BE}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+File to be repositioned
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Controls whether to advance forward or backwards (0 for forward, other
+for backward
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Number of words to advance in the file
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Reposition the read/write position of a disk
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{PRE}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{BF}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+File to be reset
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Controls whether to advance to start of file (0) or end (other)
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Reset the read/write position of a disk to the start or end
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{OPEN}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{C0}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+File to be opened
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Open a disk for use
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CLOS}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{C1}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+File to be closed
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Close a disk (saves it)
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{ADD}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{A0}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+First register to be added
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Second register to be added~
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Add two registers together and place the result in the accumulator
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{SUB}
+
+\textbf{}\\
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{A3}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register contained amount to be subtracted
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register subtracted from
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Subtract two registers and place the result in the accumulator
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{DIV}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{A6}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register containing dividend
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register containing divisor
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Divide two registers and place the result in the accumulator
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{MULT}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{A9}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+First register to be multiplied
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Second register to be multiplied
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Multiply two registers and place the result in the accumulator
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{MOD}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{AC}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register containing dividend
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register containing divisor
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Find the modulus of two registers and place the result in the
+accumulator
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{STO}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{00}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register to be read from
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Memory address to be written to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Move a word from a register to memory
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{LOD}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{03}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register to be written to.
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Memory address to be read from
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Move a word from memory to a register
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{END}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{4F}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Return to the location of the last call instruction
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{MOV}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{06}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register to move from
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register to move to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Move a word from one register to another
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{MOVA}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{07}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register to be moved to/from
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Controls which direction move occurs (0 for move from accumulator, other
+for move to)
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Move a word to/from the accumulator to/from a register
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CJNT}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{10}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+First register used to determine the conjunction
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Second register used to determine the conjunction
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Find the binary conjunction of two registers and place the result in the
+accumulator
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{DJNT}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{13}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+First register used to determine the disjunction
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Second register used to determine the disjunction
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Find the binary disjunction of two registers and place the result in the
+accumulator
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{COMP}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{16}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register containing word to be complemented
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Find the binary compliment of one register and place the result in the
+accumulator
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{LSFT}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{19}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register to be left shifted
+
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register containing number of shifts to perform
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Left shift a register and place the result in the accumulator
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{RSFT}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{1C}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register to be right shifted
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register containing number of shifts to perform
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Right shift a register and place the result in the accumulator
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CMP}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{20}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register to be compared
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Register with value to be compared against the other register
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Compare two registers and set the appropriate comparison flags
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{BRAN}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{30}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be branched to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Branch to another instruction
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{BRGT}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{31}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be branched to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Branch if the greater flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{BRLT}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{32}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be branched to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Branch if the less flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{BREQ}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{33}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be branched to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Branch if the equal flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{BRGE}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{34}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be branched to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Branch if the greater or equal flags are set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{BRLE}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{35}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be branched to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Branch if the less or equal flags are set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{BRER}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{36}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be branched to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Branch if an error flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{BROF}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{37}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be branched to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Branch if the overflow flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{BRIO}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{38}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be branched to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Branch if the ioerror flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{BRDZ}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{39}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be branched to
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Branch if divide by zero flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CALL}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{40}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be called
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Jump to another region of the program
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CAGT}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{41}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be called
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Call if the greater flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CALT}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{42}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be called
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Call if the less flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CAEQ}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{43}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be called
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Call if the equal flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CAGE}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{44}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be called
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Call if greater or equal flags are set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CALE}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{45}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be called
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Call if less or equal flags are set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CAER}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{46}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be called
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Call if an error flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CAOF}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{47}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be called
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Call if the overflow flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CAIO}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{48}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be called
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Call if the ioerror flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{CADZ}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{49}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Address of word to be called
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+Call if the divide by zero flag is set
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{HALT}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{FF}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+End program execution
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{HERR}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\textbf{EE}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+End program execution and dump execution state to the console
+\strut\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{document}

@@ -1,0 +1,2509 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+  \newcommand{\euro}{€}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage{hyperref}
+\PassOptionsToPackage{usenames,dvipsnames}{color} % color is loaded by hyperref
+\hypersetup{unicode=true,
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{longtable,booktabs}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+\date{}
+
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+\begin{document}
+
+Rumbaugh --Bricker Machine Language Specification Document
+
+Douglas Rumbaugh
+
+Zachary Bricker
+
+Harrisburg University of Science and Technology
+
+Table of Contents
+
+Abstract 6
+
+Conventions 6
+
+Text Formatting Conventions 6
+
+Boldface 6
+
+Emphasis 6
+
+Pseudocode 6
+
+RBML Machine Instructions 6
+
+Hexadecimal 7
+
+The Rumbaugh-Bricker Machine 7
+
+The 32 bit Rumbaugh-Bricker Word 8
+
+Extended Words 9
+
+Register/Memory Access Instructions 10
+
+Store Instructions 10
+
+0x00 STO 10
+
+0x01 STOA 10
+
+0x02 STOJ 11
+
+Load Instructions 11
+
+0x03 LOD 11
+
+0x04 LODA 11
+
+0x05LODJ 12
+
+Move Instructions 12
+
+0x06 MOV 12
+
+0x07 MOVA 12
+
+0x08 MOVJ 13
+
+I/O Instructions 15
+
+Console Read 15
+
+0xB0 CRDM 15
+
+0xB1 CRDR 15
+
+0xB2 CRDA 16
+
+0xB3 CRDJ 16
+
+Console Write 17
+
+0xB4 WRIT 17
+
+0xB5 WRTA 17
+
+0xB6 WRTJ 18
+
+File Read 19
+
+0xB7 FRDM 19
+
+0xB8 FRDR 19
+
+0xB9 FRDA 20
+
+0xBA FRDJ 20
+
+File Write 21
+
+0xBB FWRT 21
+
+0xBC FWTA 21
+
+0xBD FWTJ 22
+
+File Position 22
+
+0xBE REPO 22
+
+0XBF PRES 23
+
+File Access Instructions 23
+
+0xC0 OPEN 23
+
+0xC1 CLOS 23
+
+Arithmetic Instructions 25
+
+Addition 25
+
+0xA0 ADD 25
+
+0XA1 ADDA 25
+
+0xA2 ADDJ 25
+
+Subtraction 26
+
+0xA3 SUB 26
+
+0xA4 SUBA 26
+
+0xA5 SUBJ 26
+
+Division 27
+
+0xA6 DIV 27
+
+0xA7 DIVA 27
+
+0xA8 DIVJ 28
+
+Multiplication 28
+
+0xA9 MULT 28
+
+0xAA MLTA 28
+
+0XAB MLTJ 29
+
+Binary Conjunction 29
+
+0X10 CJNT 29
+
+0x11 CJNA 29
+
+0x12 CJNJ 30
+
+Binary Disjunction 30
+
+0x13 DJNT 30
+
+0x14 DJNA 30
+
+0x15 DJNJ 30
+
+Binary Complement 31
+
+0x16 COMP 31
+
+0x17 CMPA 31
+
+0x18 CMPJ 31
+
+Binary Shift 31
+
+0x19LSFT 31
+
+0x1A LSFA 32
+
+0x1B LSFJ 32
+
+0x1C RSFT 32
+
+0x1D RSFA 32
+
+0x1E RSFJ 33
+
+Modulus 33
+
+0xAC MOD 33
+
+0xAD MODA 33
+
+0xAE MODJ 34
+
+Program Control Instructions 35
+
+Comparison Instructions 35
+
+0x20 CMP 35
+
+0x21 CMPA 35
+
+0x22 CMPJ 36
+
+0x23 CMPM 36
+
+Branch Instructions 36
+
+0x30 BRAN 36
+
+0x31 BRGT 36
+
+0x32 BRLT 37
+
+0x33 BREQ 37
+
+0x34 BRGE 37
+
+0x35 BRLE 37
+
+Call Instructions 37
+
+0x40 CALL 37
+
+0x41 CAGT 37
+
+0x42 CALT 38
+
+0x43 CAEQ 38
+
+0x44 CAGE 38
+
+0x45 CALE 38
+
+0x4F END 39
+
+Halting Instructions 39
+
+0xFF HALT 39
+
+0xEE HERR 39
+
+\textbf{}\\
+
+Abstract
+
+This document contains the basic specification for the Rumbaugh-Bricker
+Machine Language instruction (RBML) set, along with suggested
+implementations of these instructions in a software emulator for the
+machine. RBML is a limited, RISC style instruction set designed to allow
+an introduction to machine coding and architecture for students and
+hobbyists. It has been boiled down to a minimal set of instructions to
+improve accessibility and ease of use. It is not intended to be a fully
+featured instruction set, but rather to allow an introduction to the
+principles of CPU instruction sets and assembly programming.
+
+Conventions
+
+Text Formatting Conventions
+
+Throughout this document, certain typesetting conventions will be
+followed to distinguish important elements within the text. These are as
+follows:
+
+Boldface
+
+\textbf{Boldface} text will be used to highlight words of special
+meaning in the context of RBML, such as instructions.
+
+Emphasis
+
+Emphasis will be used at the discretion of the authors to bring the
+reader's attention to concepts or notes that the authors consider worthy
+of special attention or consideration.
+
+Pseudocode
+
+Pseudocode, a highly abstracted language used to express programming
+concepts without delving too deeply into specific implementations, is
+used throughout this document. Pseudocode will be formatted in the
+Courier New typeface, and indented with a line number, as shown here:
+
+if (a .gr. b), then
+
+~ display(a)
+
+else if (a .eq. b), then
+
+~ display(a,b)
+
+else
+
+\begin{itemize}
+\tightlist
+\item
+  ~ display(b)
+\end{itemize}
+
+The Pseudocode conventions used in this document should present no
+difficulty to readers familiar with the high level languages of FORTRAN
+or C. A full definition of the conventions will be provided as an
+appendix to final report provided with this project.
+
+RBML Machine Instructions
+
+When presented in form of a coherent operation, perhaps to illustrate
+the intended use of an instruction, RBML code, will be written in
+Courier New and indented with a line number. There will also be a space
+between the instruction and each argument. These spaces are presented
+for ease of reading only---and are not an element of the actual
+implementation of the machine language by the authors. An example is as
+follows:
+
+\begin{itemize}
+\tightlist
+\item
+  + C0 0 0 0006
+\end{itemize}
+
++ C1 0 0 0007
+
++ A0 0 0 0000
+
++ B0 0 0 0008
+
++ E0 0 0 0008
+
++ FF 0 0 0000
+
+When a numeric literal value is needed, it will be presented without a
+separation of groups of bytes, as such:
+
++ 00000003
+
++ 00000005
+
+Hexadecimal
+
+Although other variants are certainly possible, the RBML discussed in
+this book is for a machine with a 32 bit word length. As it would be
+rather cumbersome to spell out each word in the form of 32 binary
+digits, hexadecimal will be used as a shorthand throughout this
+document. For the uninitiated, hexadecimal is a base 16 counting system,
+using the numerals: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,~ A, B, C, D, E, F. It
+maps to binary in a fairly straightforward manner: each hexadecimal
+digit represents four binary digits. So the binary number 1111 would be
+represented in hexadecimal as F (15 in decimal), and likewise 11111111
+would be FF.
+
+As such, there are 2 hexadecimal digits per byte (8 bits)---and 8
+hexadecimal digits per word (32 bits). An example of an RBML
+instruction, then, could be this:
+
+\begin{itemize}
+\tightlist
+\item
+  0C000013
+\end{itemize}
+
+This word would be rendered thus in binary:
+
+\begin{itemize}
+\tightlist
+\item
+  1100000000000000000000010011
+\end{itemize}
+
+and in decimal as:
+
+201326611
+
+When pseudocode is used to express operations, and a numeric literal is
+used, the base of this literal will be expressed by a prefix to the
+number. The standard ANSI C conventions will be used and are as follows:
+
+\begin{longtable}[c]{@{}lll@{}}
+\toprule
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+Base
+\strut\end{minipage} &
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+Prefix
+\strut\end{minipage} &
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+Example
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+Decimal
+\strut\end{minipage} &
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+None
+\strut\end{minipage} &
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+1045
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+Binary
+\strut\end{minipage} &
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+0b
+\strut\end{minipage} &
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+0b11011
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+Octal
+\strut\end{minipage} &
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+0
+\strut\end{minipage} &
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+01761
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+Hexadecimal
+\strut\end{minipage} &
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+0x
+\strut\end{minipage} &
+\begin{minipage}[t]{0.30\columnwidth}\raggedright\strut
+0xFF261
+\strut\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+When a number representing a word, an instruction, an argument, or a
+memory address appears it will always be expressed in hexadecimal,
+unless otherwise noted.
+
+The Rumbaugh-Bricker Machine
+
+Before discussing the language meant to execute in the environment, it
+would be ideal to fully define the environment first. The
+Rumbaugh-Bricker machine is an idealized computing platform built around
+a 32 bit word length. It contains a variable length area of random
+access memory, which can be allocated to hold a program, data used by
+the program (either pre-defined or written during program execution),
+and a call stack (this will be discussed in the section of this document
+discussing the `CALL' instruction and its variants). It makes use of 18
+registers---R0 through R15, an accumulator, and a jump register. It also
+has various CPU flags, which are as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  Greater Than
+\item
+  Less Than
+\item
+  Equal To
+\item
+  Buffer Overrun
+\item
+  Divide by Zero
+\end{itemize}
+
+These flags are set during the execution of CPU instructions. The first
+three are comparison flags, set by a comparison type instruction. The
+others relate to various error conditions that can occur during
+arithmetic operations.
+
+The processor of the Rumbaugh-Bricker machine is a single core, single
+threaded CPU incapable of parallel processing. It is capable of
+executing only one instruction at a time. The arithmetic-logic unit
+(ALU) of the Rumbaugh-Bricker machine is of a simple nature and does not
+have built-in support for floating point operations, or complex
+mathematical procedures like trigonometric functions. It is fully
+capable of the basic arithmetic operations of addition, subtraction,
+division, and multiplication, as well as the binary operations of
+left/right shift, disjunction, conjunction, and compliment, and also can
+perform the modulus operation.~
+
+The Rumbaugh-Bricker machine is capable of receiving input from a
+keyboard, and printing input to a console display. It can also read and
+write from binary files. There are abstracted instructions in RBML to
+allow a program to interface with these sources of input and output
+(I/O) that would not exist as instructions on a physical implementation
+of the machine. Because of the abstract nature of IO in RBML, these
+instructions include indicators specifying whether the treat the data as
+numeric, or as characters. The Rumbaugh-Bricker machine has a built in
+ASCII decoder for this purpose.
+
+The 32 bit Rumbaugh-Bricker Word
+
+The version of the Rumbaugh-Bricker machine discussed in this document
+as a word length of 32 bits. Depending upon the context, these bits will
+be divided into various groups. There are two contexts in which a word
+can be viewed: as a machine instruction, or as binary data.~
+
+\textbf{F}
+
+\textbf{F}
+
+\textbf{FFFF}
+
+\textbf{FF}
+
+\textbf{Argument 3}
+
+\textbf{Argument 2}
+
+\textbf{Operator}
+
+\textbf{Argument 1}
+
+\textbf{F}
+
+\textbf{F}
+
+\textbf{FFFF}
+
+\textbf{FF}
+
+\textbf{Argument 3}
+
+\textbf{Argument 2}
+
+\textbf{Operator}
+
+\textbf{Argument 1}
+
+~
+
+In most cases, the first two arguments will be used to specify
+registers, containing a number between 0 and 15. The third argument is
+generally used to specify a memory address---allowing the 32 bit word to
+access a maximum of 2 megabytes of memory.
+
+Register/Memory Access Instructions
+
+The Rumbaugh-Bricker machine contains 18 registers and an arbitrary
+amount of random access memory. These are the instructions that allow
+data to be moved to and from these areas of storage. Every region of
+memory, and every register, is defined as containing one 32 bit word.
+
+The instructions that allow access to temporary storage are broken into
+three broad categories. These are \textbf{store}, \textbf{load}, and
+\textbf{move}. Store instructions allow a word to be moved from a
+register and into memory. Load instructions do the reverse---taking data
+out of a region of memory and placing it into a register. Finally, move
+instructions allow data to be taken from one machine register, and
+placed into another.
+
+Store Instructions
+
+0x00 STO
+
+The STO instruction makes use of ARG1 and ARG3 of the word. Any data in
+ARG2 will be ignored. STO takes the data contained in the register
+defined by ARG1 and places it into the region of memory defined by ARG3.
+An example of the use of STO is as follows:
+
++ 00 2 0 000F
+
+This invocation of the STO instruction will take a word stored in R2,
+and move it to the memory address 0x000F.
+
+Any data present in the region of memory defined by ARG3 will be
+overwritten by the word in the register defined by ARG1. The value used
+in the register defined by ARG1 will remain unchanged. As such, after
+the execution of this instruction, the region of memory defined by ARG3
+and the register defined by ARG1 should contain the same value.~
+
+This instruction will not set any machine flags, nor alter the machine
+state in any way other than the copying of a value from the specified
+register to a specified region of memory.
+
+0x01 STOA
+
+The STOA instruction makes use of ARG3 of the word. Any data in ARG1 or
+ARG2 will be ignored. STOA takes the data contained in the accumulator
+register and places it into the region of memory defined by ARG3. An
+example of the use of STOA is as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  + 01 0 0 000F
+\end{itemize}
+
+This invocation of the STOA instruction will take a word stored in the
+accumulator, and move it to the memory address 0x000F.
+
+Any data present in the region of memory defined by ARG3 will be
+overwritten by the word in the accumulator. The value in the accumulator
+will remain unchanged. As such, after the execution of this instruction,
+the region of memory defined by ARG3 and the accumulator should contain
+the same value.
+
+This instruction will not set any machine flags, nor alter the machine
+state in any way other than the copying of a value from the specified
+register to a specified region of memory.
+
+0x02 STOJ
+
+The STOJ instruction makes use of ARG3 of the word. Any data in ARG1 or
+ARG2 will be ignored. STOJ takes the data contained in the jump register
+and places it into the region of memory defined by ARG3. An example of
+the use of STOJ is as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  + 02 0 0 000F
+\end{itemize}
+
+This invocation of the STOJ instruction will take a word stored in the
+jump register, and move it to the memory address 0x000F.
+
+Any data present in the region of memory defined by ARG3 will be
+overwritten by the word in the jump register. The value in the
+accumulator will remain unchanged. As such, after the execution of this
+instruction, the region of memory defined by ARG3 and the jump register
+should contain the same value.
+
+This instruction will not set any machine flags, nor alter the machine
+state in any way other than the copying of a value from the specified
+register to a specified region of memory.
+
+The STOJ instruction will be automatically invoked by the machine in the
+process of call stack maintenance. For more information on this, refer
+to the Rumbaugh-Bricker Machine Specification document.
+
+Load Instructions
+
+0x03 LOD
+
+The LOD instruction makes use of ARG1 and ARG3 of the word. Any data in
+ARG2 will be ignored. LOD takes the data stored in the region of memory
+specified by ARG3 and places it into the machine register defined by
+ARG1. An example of the use of LOAD is as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  + 03 1 0 003E
+\end{itemize}
+
+This invocation of the LOD instruction will take a word stored in the
+region of memory at 0x003E and place it into R1.
+
+Any data present in the register defined by ARG1 will be overwritten by
+the word in the region of memory defined by ARG3. The value in the
+region of memory defined by ARG3 will remain unchanged. As such, after
+the execution of this instruction, the register defined by ARG1, and the
+region of memory defined by R3, should contain the same value.
+
+This instruction will not set any machine flags, nor alter the machine
+state in any way other than the copying of a value from the specified
+region of memory to the specified register.
+
+0x04 LODA
+
+The LODA instruction makes use of ARG3 of the word. Any data in ARG1 or
+ARG2 will be ignored. LODA takes the data stored in the region of memory
+specified by ARG3 and places it into the accumulator. An example of the
+use of LODA is as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  + 04 0 0 003E
+\end{itemize}
+
+This invocation of the LODA instruction will take a word stored in the
+region of memory at 0x003E and place it into the accumulator.
+
+Any data present in the accumulator will be overwritten by the word in
+the region of memory defined by ARG3. The value in the region of memory
+defined by ARG3 will remain unchanged. As such, after the execution of
+this instruction, the accumulator, and the region of memory defined by
+R3, should contain the same value.
+
+This instruction will not set any machine flags, nor alter the machine
+state in any way other than the copying of a value from the specified
+region of memory to the specified register.
+
+0x05LODJ
+
+The LODJ instruction makes use of ARG3 of the word. Any data in ARG1 or
+ARG2 will be ignored. LODA takes the data stored in the region of memory
+specified by ARG3 and places it into the jump register. An example of
+the use of LODJ is as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  + 04 0 0 003E
+\end{itemize}
+
+This invocation of the LODJ instruction will take a word stored in the
+region of memory at 0x003E and place it into the accumulator.
+
+Any data present in the accumulator will be overwritten by the word in
+the region of memory defined by ARG3. The value in the region of memory
+defined by ARG3 will remain unchanged. As such, after the execution of
+this instruction, the accumulator, and the region of memory defined by
+R3, should contain the same value.
+
+This instruction will not set any machine flags, nor alter the machine
+state in any way other than the copying of a value from the specified
+region of memory to the specified register.
+
+The LODJ instruction will be automatically invoked by the machine in the
+process of call stack maintenance. For more information on this, refer
+to the Rumbaugh-Bricker Machine Specification document.
+
+Move Instructions
+
+0x06 MOV
+
+The MOV instruction makes use of ARG1 and ARG2 of the word. Any data in
+ARG3 will be ignored. MOV takes the data stored in a register specified
+by ARG1, and places it into a register specified by ARG2. An example of
+MOV is as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  + 06 1 3 0000
+\end{itemize}
+
+This invocation of the MOV instruction will take a word stored in R1,
+and place it into R3.
+
+Any data present in the register defined by ARG2 will be overwritten by
+the word in the register defined by ARG1. The data present in the
+register defined by ARG1 will remain unchanged. As such, after the
+execution of this instruction, the data contained in the register
+defined by ARG1 and the data contained in the register defined by ARG2
+should be the same.
+
+This instruction will not set any machine flags, nor alter the machine
+state in any way other than the copying of data from the specified
+register to the specified register.
+
+0x07 MOVA
+
+The MOVA instruction makes use of ARG1 and ARG3 of the word. Any data in
+ARG2 will be ignored. MOVA performs three different functions, depending
+upon whether the data in ARG3 is equal to zero, or greater than zero. If
+the data in ARG3 is greater than zero, then MOVA takes the data stored
+in the accumulator and moves it into the register defined by ARG1. If
+the data in ARG3 is equal to zero, then MOVA takes the data stored in
+the register defined by ARG1 and moves it into the accumulator. An
+example of MOVA is as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  + 07 1 0 0000
+\end{itemize}
+
+This invocation of the MOVA instruction will take the data stored in R1,
+and move it into the accumulator.
+
+When MOVA is used in this manner, any data present in the accumulator
+will be overwritten by the word in the register defined by ARG1. The
+data present in the register defined by ARG1 will remain unchanged. As
+such, after the execution of this instruction, the data contained in the
+register defined by ARG1, and the accumulator should be the same.
+
+Another example of the MOVA instruction is as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  + 07 1 0 FFFF
+\end{itemize}
+
+Because the content of ARG3 is greater than zero, this invocation of the
+MOVA instruction will take the data stored in the accumulator, and move
+it into R1.
+
+When MOVA is used in this manner, any data present in the register
+defined by ARG1 will be overwritten by the word in the accumulator. The
+data present in the accumulator will remain unchanged. As such, after
+the execution of this instruction, the data contained in the
+accumulator, and the data contained in the register defined by ARG1
+should be the same.
+
+This instruction will not set any machine flags, nor alter the machine
+state in any way other than the copying of data from the specified
+register to the specified register.
+
+0x08 MOVJ
+
+The MOVJ instruction makes use of ARG1 and ARG3 of the word. Any data in
+ARG2 will be ignored. MOVJ performs three different functions, depending
+upon whether the data in ARG3 is equal to zero, or greater than zero. If
+the data in ARG3 is greater than zero, then MOVJ takes the data stored
+in the jump register and moves it into the register defined by ARG1. If
+the data in ARG3 is equal to zero, then MOVJ takes the data stored in
+the register defined by ARG1 and moves it into the jump register. An
+example of MOVJ is as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  + 08 1 0 0000
+\end{itemize}
+
+This invocation of the MOVJ instruction will take the data stored in R1,
+and move it into the jump register.
+
+When MOVJ is used in this manner, any data present in the jump register
+will be overwritten by the word in the register defined by ARG1. The
+data present in the register defined by ARG1 will remain unchanged. As
+such, after the execution of this instruction, the data contained in the
+register defined by ARG1, and the jump register should be the same.
+
+Another example of the MOVJ instruction is as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  + 08 1 0 FFFF
+\end{itemize}
+
+Because the content of ARG3 is greater than zero, this invocation of the
+MOVJ instruction will take the data stored in the jump register, and
+move it into R1.
+
+When MOVJ is used in this manner, any data present in the register
+defined by ARG1 will be overwritten by the word in the jump register.
+The data present in the jump register will remain unchanged. As such,
+after the execution of this instruction, the data contained in the jump
+register, and the data contained in the register defined by ARG1 should
+be the same.
+
+This instruction will not set any machine flags, nor alter the machine
+state in any way other than the copying of data from the specified
+register to the specified register.
+
+I/O Instructions
+
+Console Read
+
+0xB0 CRDM
+
+The CRDM instruction makes use of ARG1 and ARG3 of the word. Any data in
+ARG2 will be ignored. CRDM reads a word from the console and places it
+directly into a region of memory specified by ARG3. ARG1 is used to
+specify the format of the data being read in. A value of 0 for ARG1
+indicates that the data is numeric, and anything else indicates that the
+data is a character string. An example of CRDM is as follows:
+
++ B0 0 0 003F
+
+This invocation of the CRDM instruction will read a numeric word typed
+into the console and place it into memory location 0x003F.~
+
+Another example is this:
+
++ B0 1 0 003F
+
+This invocation of CRDM will read a word's worth of characters (4) from
+the console and place them into memory location 0x003F.
+
+In the event that more than one word of data is entered, the machine
+overflow flag will be set and only the first word will be read into
+memory---the rest of the input will be discarded.
+
+The contents of the region of memory specified by ARG3 will be
+overwritten with the word read in from the console.
+
+This instruction will only set the machine overflow flag, and will only
+alter the region of memory specified by ARG3. It will not alter the
+machine state in any other way.
+
+0xB1 CRDR
+
+The CRDR instruction makes use of ARG1, ARG2 of the word. Any data in
+ARG3 will be ignored. CRDR reads a word from the console and places it
+into a register specified by ARG2. ARG1 is used to specify the format of
+the data being read in. A value of 0 indicates that the data is numeric,
+and anything else indicates that the data is a character string. An
+example of CRDR is as follows
+
++ B1 0 4 0000
+
+This invocation of CRDR will read a numeric word typed into the console
+and place it into R4.
+
+Another example is this:
+
++ B1 1 4 0000
+
+This invocation of CRDR will read a word's worth of characters (4) from
+the console and place them into R4.
+
+In the event that more than one word of data is entered, the machine
+overflow flag will be set, and only the first word will be read into the
+register specified by ARG2---the rest of the input will be discarded.
+
+The contents of the register specified by ARG2 will be overwritten with
+the word read in from the console.
+
+This instruction will only set the machine overflow flag, and will only
+alter the register specified by ARG2. It will not alter the machine
+state in any other way.
+
+0xB2 CRDA
+
+The CRDA instruction makes use of ARG1 of the word. Any data in ARG2 or
+ARG3 will be ignored. CRDA reads a word from the console and places it
+into the accumulator. ARG1 is used to specify the format of the data
+being read in. A value of 0 indicates that the data is numeric, and
+anything else indicates that the data is a character string. An example
+of CRDA is as follows
+
++ B2 0 0 0000
+
+This invocation of CRDA will read a numeric word typed into the console
+and place it into the accumulator.
+
+Another example is this:
+
++ B2 1 0 0000
+
+This invocation of CRDA will read a word's worth of characters (4) from
+the console and place them into the accumulator.
+
+In the event that more than one word of data is entered, the machine
+overflow flag will be set, and only the first word will be read into the
+accumulator---the rest of the input will be discarded.
+
+The contents of the accumulator will be overwritten with the word read
+in from the console.
+
+This instruction will only set the machine overflow flag, and will only
+alter the accumulator. It will not alter the machine state in any other
+way.
+
+0xB3 CRDJ
+
+The CRDJ instruction makes use of ARG1 of the word. Any data in ARG2 or
+ARG3 will be ignored. CRDJ reads a word from the console and places it
+into the jump register. ARG1 is used to specify the format of the data
+being read in. A value of 0 indicates that the data is numeric, and
+anything else indicates that the data is a character string. An example
+of CRDJ is as follows
+
++ B3 0 0 0000
+
+This invocation of CRDJ will read a numeric word typed into the console
+and place it into the jump register.
+
+Another example is this:
+
+\begin{itemize}
+\tightlist
+\item
+  + B3 1 0 0000
+\end{itemize}
+
+This invocation of CRDJ will read a word's worth of characters (4) from
+the console and place them into the jump register.
+
+In the event that more than one word of data is entered, the machine
+overflow flag will be set, and only the first word will be read into the
+jump register---the rest of the input will be discarded.
+
+The contents of the jump register will be overwritten with the word read
+in from the console.
+
+This instruction will only set the machine overflow flag, and will only
+alter the jump register. It will not alter the machine state in any
+other way.
+
+Console Write
+
+0xB4 WRIT
+
+The WRIT instruction makes use of ARG1 and ARG2 of the word. Any data in
+ARG3 will be ignored. WRIT takes a word from the register specified by
+ARG2 and writes it to the console. ARG1 is used to specify the format of
+the data being written out. A value of 0 indicates that the data is
+numeric, and anything else indicates that the data is a character
+string.
+
+While writing out character strings, no newlines will be forced by the
+system. Each word will be attached end to end in the output, with the
+only whitespace being that defined within them. All characters will be
+converted from their internal numeric representation to their character
+display representation prior to being displayed.
+
+While writing out numeric words, newlines will be forced after each
+word. In order to print out multiple numeric words on the same line,
+they will need to first be converted into character strings and have
+whitespace characters added to them. This is done to allow for multiple
+numbers to be printed with subsequent invocations of WRIT, without
+needing to alternate between a WRIT for the number, and a WRIT for a
+newline or whitespace character. All numbers will be converted to
+decimal notation prior to being displayed.
+
+An example of WRIT is as follows:
+
++ B4 0 4 0000
+
+This invocation of WRIT will print the contents of R4 to the console,
+with the data being interpreted as numeric and shown in decimal format.
+A newline character will automatically be added by the system at the end
+of the number.
+
+Another example of WRIT is this:
+
++ B4 1 4 0000
+
+This invocation will print the contents of R4 to the console, with the
+data being interpreted as a character string and shown in character
+format. No additional whitespace characters beyond those contained in
+the word will be added by the system at the end of the word.
+
+The contents of the register specified by ARG2 will remain unchanged
+after the execution of the WRIT instruction.
+
+This instruction will not set any flags, nor alter the machine state in
+any way. Its only purpose is to display data to the console.
+
+0xB5 WRTA
+
+The WRTA instruction makes use of ARG1 of the word. Any data in ARG2 or
+ARG3 will be ignored. WRTA takes a word from the accumulator and writes
+it to the console. ARG1 is used to specify the format of the data being
+written out. A value of 0 indicates that the data is numeric, and
+anything else indicates that the data is a character string.
+
+While writing out character strings, no newlines will be forced by the
+system. Each word will be attached end to end in the output, with the
+only whitespace being that defined within them. All characters will be
+converted from their internal numeric representation to their character
+display representation prior to being displayed.
+
+While writing out numeric words, newlines will be forced after each
+word. In order to print out multiple numeric words on the same line,
+they will need to first be converted into character strings and have
+whitespace characters added to them. This is done to allow for multiple
+numbers to be printed with subsequent invocations of WRTA, without
+needing to alternate between a WRTA for the number, and a WRIT for a
+newline or whitespace character. All numbers will be converted to
+decimal notation prior to being displayed.
+
+An example of WRTA is as follows:
+
++ B5 0 4 0000
+
+This invocation of WRTA will print the contents of the accumulator to
+the console, with the data being interpreted as numeric and shown in
+decimal format. A newline character will automatically be added by the
+system at the end of the number.
+
+Another example of WRTA is this:
+
++ B5 1 4 0000
+
+This invocation will print the contents of the accumulator to the
+console, with the data being interpreted as a character string and shown
+in character format. No additional whitespace characters beyond those
+contained in the word will be added by the system at the end of the
+word.
+
+The contents of the accumulator will remain unchanged after the
+execution of the WRTA instruction.
+
+This instruction will not set any flags, nor alter the machine state in
+any way. Its only purpose is to display data to the console.
+
+0xB6 WRTJ
+
+The WRTJ instruction makes use of ARG1 of the word. Any data in ARG2 or
+ARG3 will be ignored. WRTJ takes a word from the jump register and
+writes it to the console. ARG1 is used to specify the format of the data
+being written out. A value of 0 indicates that the data is numeric, and
+anything else indicates that the data is a character string.
+
+While writing out character strings, no newlines will be forced by the
+system. Each word will be attached end to end in the output, with the
+only whitespace being that defined within them. All characters will be
+converted from their internal numeric representation to their character
+display representation prior to being displayed.
+
+While writing out numeric words, newlines will be forced after each
+word. In order to print out multiple numeric words on the same line,
+they will need to first be converted into character strings and have
+whitespace characters added to them. This is done to allow for multiple
+numbers to be printed with subsequent invocations of WRTJ, without
+needing to alternate between a WRTJ for the number, and a WRIT for a
+newline or whitespace character. All numbers will be converted to
+decimal notation prior to being displayed.
+
+An example of WRTJ is as follows:
+
++ B6 0 4 0000
+
+This invocation of WRTJ will print the contents of the jump register to
+the console, with the data being interpreted as numeric and shown in
+decimal format. A newline character will automatically be added by the
+system at the end of the number.
+
+Another example of WRTJ is this:
+
++ B6 1 4 0000
+
+This invocation will print the contents of the jump register to the
+console, with the data being interpreted as a character string and shown
+in character format. No additional whitespace characters beyond those
+contained in the word will be added by the system at the end of the
+word.
+
+The contents of the jump register will remain unchanged after the
+execution of the WRTJ instruction.
+
+This instruction will not set any flags, nor alter the machine state in
+any way. Its only purpose is to display data to the console.
+
+File Read
+
+0xB7 FRDM
+
+The FRDM instruction makes use of ARG1 and ARG3 of the word. Any data in
+ARG2 will be ignored. FRDM reads the next word in from the open file
+specified by ARG1, and places it into the region of memory specified by
+ARG3.
+
+FRDM can only read binary files. This does not mean that it cannot read
+in character strings---but these strings must be in binary format. A
+binary format character string can be displayed as a normal character
+string using an appropriately formatted Console Write instruction.
+
+An example of FRDM is this:
+
++ B7 1 0 046E
+
+This invocation of FRDM will read the next word from File 1, and place
+it into the region of memory at 0x046E.
+
+The contents of the file specified by ARG1 will remain unchanged
+following the execution of this command, and the contents of the region
+of memory defined by ARG3 will be overwritten. As such, the data
+contained in the region of memory specified by ARG3, and the contents of
+the file specified by ARG1 at the read point in question, should be the
+same following the execution of this instruction.
+
+This instruction will not set any flags. It will only alter the region
+of memory specified by ARG3. It will not alter the machine state in any
+other way.
+
+0xB8 FRDR
+
+The FRDR instruction makes use of ARG1 and ARG2 of the word. Any data in
+ARG3 will be ignored. FRDR reads the next word in from the open file
+specified by ARG1, and places it into the register specified by ARG2.
+
+FRDR can only read binary files. This does not mean that it cannot read
+in character strings---but these strings must be in binary format. A
+binary format character string can be displayed as a normal character
+string using an appropriately formatted Console Write instruction.
+
+An example of FRDR is this:
+
+\begin{itemize}
+\tightlist
+\item
+  + B8 1 1 0000
+\end{itemize}
+
+This invocation of FRDR will read the next word from File 1, and place
+it into R1.
+
+The contents of the file specified by ARG1 will remain unchanged
+following the execution of this command, and the contents of the
+register defined by ARG2 will be overwritten. As such, the data
+contained in the register specified by ARG2, and the contents of the
+file specified by ARG1 at the read point in question, should be the same
+following the execution of this instruction.
+
+This instruction will not set any flags. It will only alter the register
+specified by ARG2. It will not alter the machine state in any other way.
+
+0xB9 FRDA
+
+The FRDA instruction makes use of ARG1 of the word. Any data in ARG2 or
+ARG3 will be ignored. FRDA reads the next word in from the open file
+specified by ARG1, and places it into the accumulator.
+
+FRDA can only read binary files. This does not mean that it cannot read
+in character strings---but these strings must be in binary format. A
+binary format character string can be displayed as a normal character
+string using an appropriately formatted Console Write instruction.
+
+An example of FRDA is this:
+
++ B9 1 0 0000
+
+This invocation of FRDA will read the next word from File 1, and place
+it into the accumulator.
+
+The contents of the file specified by ARG1 will remain unchanged
+following the execution of this command, and the contents of the
+accumulator will be overwritten. As such, the data contained in the
+accumulator, and the contents of the file specified by ARG1 at the read
+point in question, should be the same following the execution of this
+instruction.
+
+This instruction will not set any flags. It will only alter the
+accumulator. It will not alter the machine state in any other way.
+
+0xBA FRDJ
+
+The FRDJ instruction makes use of ARG1 of the word. Any data in ARG2 or
+ARG3 will be ignored. FRDJ reads the next word in from the open file
+specified by ARG1, and places it into the jump register.
+
+FRDJ can only read binary files. This does not mean that it cannot read
+in character strings---but these strings must be in binary format. A
+binary format character string can be displayed as a normal character
+string using an appropriately formatted Console Write instruction.
+
+An example of FRDJ is this:
+
++ BA 1 0 0000
+
+This invocation of FRDJ will read the next word from File 1, and place
+it into the jump register.
+
+The contents of the file specified by ARG1 will remain unchanged
+following the execution of this command, and the contents of the jump
+register will be overwritten. As such, the data contained in the jump
+register, and the contents of the file specified by ARG1 at the read
+point in question, should be the same following the execution of this
+instruction.
+
+This instruction will not set any flags. It will only alter the jump
+register. It will not alter the machine state in any other way.
+
+File Write
+
+0xBB FWRT
+
+The FWRT instruction makes use of ARG1 and ARG2 of the word. Any data in
+ARG3 will be ignored. FWRT writes the word contained in the register
+specified by ARG2 to the file specified by ARG1, and advances the write
+position in the specified file by one word.
+
+FWRT can only write to binary files. Character strings will be written
+using their binary representation. There will be no whitespace or
+formatting applied to the file---aside from the ASCII whitespace
+characters contained within a written character string.
+
+An example of FRWT is this:
+
++ BB 1 2 0000
+
+This invocation of FWRT will write the word contained in R2 to File 1,
+and advance the write position in File 1 forward one word.
+
+The contents of the register specified by ARG2 will remain unchanged
+following the execution of this command, and the contents of the file
+specified by ARG1 at the write position will be overwritten. As such,
+the data at the initial write position of the file specified by ARG1,
+and the data in the register specified by ARG2, should be the same
+following the execution of this instruction.
+
+This instruction will not set any machine flags. It will only alter the
+file being written to. It will not alter the machine state in any other
+way.
+
+0xBC FWTA
+
+The FWTA instruction makes use of ARG1 of the word. Any data in ARG2 or
+ARG3 will be ignored. FWTA writes the word contained in the accumulator
+to the file specified by ARG1, and advances the write position in the
+specified file by one word.
+
+FWTA can only write to binary files. Character strings will be written
+using their binary representation. There will be no whitespace or
+formatting applied to the file---aside from the ASCII whitespace
+characters contained within a written character string.
+
+An example of FWTA is this:
+
+\begin{itemize}
+\tightlist
+\item
+  + BC 1 0 0000
+\end{itemize}
+
+This invocation of FWTA will write the word contained in the accumulator
+to File 1, and advance the write position in File 1 forward one word.
+
+The contents of the accumulator will remain unchanged following the
+execution of this command, and the contents of the file specified by
+ARG1 at the write position will be overwritten. As such, the data at the
+initial write position of the file specified by ARG1, and the data in
+the accumulator, should be the same following the execution of this
+instruction.
+
+This instruction will not set any machine flags. It will only alter the
+file being written to. It will not alter the machine state in any other
+way.
+
+0xBD FWTJ
+
+The FWTJ instruction makes use of ARG1 of the word. Any data in ARG2 or
+ARG3 will be ignored. FWTJ writes the word contained in the jump
+register to the file specified by ARG1, and advances the write position
+in the specified file by one word.
+
+FWTJ can only write to binary files. Character strings will be written
+using their binary representation. There will be no whitespace or
+formatting applied to the file---aside from the ASCII whitespace
+characters contained within a written character string.
+
+An example of FWTJ is this:
+
++ BD 1 0 0000
+
+This invocation of FWTJ will write the word contained in the jump
+register to File 1, and advance the write position in File 1 forward one
+word.
+
+The contents of the jump register will remain unchanged following the
+execution of this command, and the contents of the file specified by
+ARG1 at the write position will be overwritten. As such, the data at the
+initial write position of the file specified by ARG1, and the data in
+the jump register, should be the same following the execution of this
+instruction.
+
+This instruction will not set any machine flags. It will only alter the
+file being written to. It will not alter the machine state in any other
+way.
+
+File Position
+
+0xBE REPO
+
+The REPO instruction makes use of ARG1, ARG2, and ARG3 of the word. REPO
+will advance the write/read position in a file specified by ARG1
+forwards or backwards by the number of steps indicated in ARG3. If the
+indicated number of steps would move the write/read position past the
+beginning or end of the file, the position will stop when the beginning
+or end of the file is reached and the remaining steps will be discarded.
+The contents of ARG2 will indicate whether to advance forward or
+backward. If ARG2 is equal to zero, then the write/read position will be
+advanced forwards, towards the end of the file. If ARG2 is greater than
+zero, then the write/read position will be advanced backwards, towards
+the beginning of the file.
+
+An example of REPO is this:
+
+BE 1 0 0001
+
+This invocation of REPO will advance the write/read position in File 1
+forward by one word.
+
+Another example is:
+
+BE 1 1 0001
+
+This invocation of REPO will advance the write/read position in File 1
+backwards by one word.
+
+The contents of the file specified by ARG1 will remain unchanged
+following the execution of this command.
+
+This instruction will not set any machine flags. It will only alter the
+write/read position in the file specified by ARG1. It will not alter the
+machine state in any other way.
+
+0XBF PRES
+
+The PRES instruction makes use of ARG1 and ARG2. Any data in ARG3 will
+be ignored. PRES will advance the write/read position in a file
+specified by ARG1 to either the beginning, or end, of the file,
+depending upon the contents of ARG2. If ARG2 contains zero, then the
+write/read position is moved to the beginning of the file specified by
+ARG1. It ARG2 contains a value greater than zero, then the write/read
+position is advanced to the end of the file specified by ARG1.
+
+An example of the PRES instruction is as follows:
+
+BF 1 0 0000
+
+This invocation of PRES will advance the write/read position in File 1
+to the beginning of the file. Another example of the instruction is:
+
+BF 1 1 0000
+
+This invocation of PRES will advance the write/read position in File 1
+to the end of the file.
+
+The contents of the file specified by ARG1 will remain unchanged
+following the execution of this command.
+
+This instruction will not set any machine flags. It will only alter the
+write/read position in the file specified by ARG1. It will not alter the
+machine state in any other way.
+
+File Access Instructions
+
+0xC0 OPEN
+
+The OPEN instruction makes use of ARG1. Any data in ARG2 or ARG3 will be
+ignored. OPEN will make available for use in the program the file
+specified by ARG1, and position the write/read position at the beginning
+of the file.~
+
+An example of the OPEN instruction is as follows:
+
+C0 3 0 0000
+
+This invocation of OPEN will allow other I/O operations to be performed
+upon File 3.
+
+This instruction will not set any machine flags. It will only allow
+future I/O instructions to operate upon the file specified by ARG1. It
+will not alter the machine state in any other way.
+
+0xC1 CLOS
+
+The CLOS instruction makes use of ARG1. Any data in ARG2 or ARG3 will be
+ignored. CLOS will prevent future I/O instructions from accessing the
+file specified by ARG1, until it has been opened again using the OPEN
+instruction. ~
+
+Executing CLOS on a file will allow its contents to persist on secondary
+storage after the end of the program within which a CLOS instruction was
+executed.~ If a file was written to, and not properly closed, the data
+written to it may not properly persist following the end of the program
+in which it was written to.
+
+An example of the CLOS instruction is as follows:
+
+C1 3 0 0000
+
+This invocation of CLOS will prevent future I/O operations from being
+performed upon File 3.
+
+This instruction will not set any machine flags. It will only prevent
+future I/O instructions from operating upon the file specified by ARG1.
+It will not alter the machine state in any other way.
+
+Arithmetic Instructions
+
+Addition
+
+0xA0 ADD
+
+The ADD instruction will make use of ARG1 and ARG2 of the word. Any data
+in ARG3 will be ignored. ADD will perform an arithmetic addition upon
+the two words in the registers specified by ARG1 and ARG2, and place the
+resulting word in the accumulator.
+
+The ADD instruction will be commutative---the order in which the
+registers are specified will not affect the result.~
+
+Should the arithmetic addition of the two words result in a value that
+is greater than that which can be contained in the accumulator, the
+machine overflow flag will be set and the accumulator will be loaded
+with the final 32 bits of the result---with the excess leading bits
+being truncated.~
+
+The data in the accumulator will be overwritten by the ADD instruction.
+It will not affect the contents of any of the other register.~
+
+The ADD instruction will be able to set the overflow flag. It will not
+be able to change any other flags. It will not be able to change the
+state of the machine in any way other than by changing the contents of
+the accumulator and setting the overflow flag.
+
+0XA1 ADDA
+
+The ADDA instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. ADDA will perform an arithmetic addition upon
+the word in the accumulator, and the word in the register specified by
+ARG1, and place the resulting word in the accumulator.
+
+Should the arithmetic addition of the two words result in a value that
+is greater than that which can be contained in the accumulator, the
+machine overflow flag will be set and the accumulator will be loaded
+with the final 32 bits of the result---with the excess leading bits
+being truncated.
+
+The data in the accumulator will be overwritten by the ADDA instruction.
+It will not affect the contents of any of the other register.~
+
+The ADDA instruction will be able to set the overflow flag. It will not
+be able to change any other flags. It will not be able to change the
+state of the machine in any way other than by changing the contents of
+the accumulator and setting the overflow flag.
+
+0xA2 ADDJ
+
+The ADDJ instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. ADDJ will perform an arithmetic addition upon
+the word in the jump register, and the word in the register specified by
+ARG1, and place the resulting word in the accumulator.
+
+Should the arithmetic addition of the two words result in a value that
+is greater than that which can be contained in the accumulator, the
+machine overflow flag will be set and the accumulator will be loaded
+with the final 32 bits of the result---with the excess leading bits
+being truncated.
+
+The data in the accumulator will be overwritten by the ADDJ instruction.
+It will not affect the contents of any of the other register.~
+
+The ADDJ instruction will be able to set the overflow flag. It will not
+be able to change any other flags. It will not be able to change the
+state of the machine in any way other than by changing the contents of
+the accumulator and setting the overflow flag.
+
+Subtraction
+
+0xA3 SUB
+
+The SUB instruction will make use of ARG1 and ARG2 of the word. Any data
+in ARG3 will be ignored. SUB will perform an arithmetic subtraction upon
+the two words in the registers specified by ARG1 and ARG2, and place the
+resulting word in the accumulator.
+
+The SUB instruction will not be commutative---the order of subtraction
+will be governed by which argument is used to specify the register. It
+will always subtract the register specified by ARG1 from the register
+specified by ARG2.
+
+Should the arithmetic subtraction of the two words result in a value
+that is smaller than that which can be contained in the accumulator, the
+machine overflow flag will be set and the accumulator will be loaded
+with the final 32 bits of the result---with the excess leading bits
+being truncated.~
+
+The data in the accumulator will be overwritten by the SUB instruction.
+It will not affect the contents of any of the other register.~
+
+The SUB instruction will be able to set the overflow flag. It will not
+be able to change any other flags. It will not be able to change the
+state of the machine in any way other than by changing the contents of
+the accumulator and setting the overflow flag
+
+0xA4 SUBA
+
+The SUBA instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. SUBA will perform an arithmetic subtraction
+upon the two words in the registers specified by ARG1 and the
+accumulator, and place the resulting word in the accumulator.
+
+The SUBA instruction will not be commutative---the order of subtraction
+will be governed by which argument is used to specify the register. It
+will always subtract the register specified by ARG1 from the
+accumulator.
+
+Should the arithmetic subtraction of the two words result in a value
+that is smaller than that which can be contained in the accumulator, the
+machine overflow flag will be set and the accumulator will be loaded
+with the final 32 bits of the result---with the excess leading bits
+being truncated.~
+
+The data in the accumulator will be overwritten by the SUBA instruction.
+It will not affect the contents of any of the other register.~
+
+The SUBA instruction will be able to set the overflow flag. It will not
+be able to change any other flags. It will not be able to change the
+state of the machine in any way other than by changing the contents of
+the accumulator and setting the overflow flag.
+
+0xA5 SUBJ
+
+The SUBJ instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. SUBJ will perform an arithmetic subtraction
+upon the two words in the registers specified by ARG1 and the jump
+register, and place the resulting word in the accumulator.
+
+The SUBJ instruction will not be commutative---the order of subtraction
+will be governed by which argument is used to specify the register. It
+will always subtract the register specified by ARG1 from the jump
+register.
+
+Should the arithmetic subtraction of the two words result in a value
+that is smaller than that which can be contained in the accumulator, the
+machine overflow flag will be set and the accumulator will be loaded
+with the final 32 bits of the result---with the excess leading bits
+being truncated.~
+
+The data in the accumulator will be overwritten by the SUBJ instruction.
+It will not affect the contents of any of the other register.~
+
+The SUBJ instruction will be able to set the overflow flag. It will not
+be able to change any other flags. It will not be able to change the
+state of the machine in any way other than by changing the contents of
+the accumulator and setting the overflow flag.
+
+Division
+
+0xA6 DIV
+
+The DIV instruction will make use of ARG1 and ARG2 of the word. Any data
+in ARG3 will be ignored. DIV will perform an integer division upon the
+two words in the registers specified by ARG1 and ARG2, and place the
+resulting word in the accumulator.
+
+The DIV instruction will not be commutative---the order of division will
+be governed by which argument is used to specify the register. The
+register specified by ARG1 will supply the dividend, and the register
+specified by ARG2 will supply the divisor.
+
+Should the word contained in the register defined by ARG2 have a value
+of 0, no division will occur. In this case, the divide-by-zero flag will
+be set, and the accumulator will be populated with low bits.~
+
+The data in the accumulator will be overwritten by the DIV instruction.
+It will not affect the contents of any other register.
+
+The DIV instruction will be able to set the divide-by-zero flag. It will
+not be able to change any other flags. It will not be able to change the
+state of the machine in any way other than by changing the contents of
+the accumulator, and setting the divide-by-zero flag.
+
+0xA7 DIVA
+
+The DIVA instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. DIVA will perform an integer division upon the
+word in the register specified by ARG1 and the word in the accumulator,
+and place the resulting word in the accumulator.
+
+The DIVA instruction will not be commutative---the order of division
+will be governed by which argument is used to specify the register. The
+register specified by ARG1 will supply the dividend, and the accumulator
+will supply the divisor.
+
+Should the word contained in the accumulator have a value of 0, no
+division will occur. In this case, the divide-by-zero flag will be set,
+and the accumulator will be populated with low bits.~
+
+The data in the accumulator will be overwritten by the DIVA instruction.
+It will not affect the contents of any other register.
+
+The DIVA instruction will be able to set the divide-by-zero flag. It
+will not be able to change any other flags. It will not be able to
+change the state of the machine in any way other than by changing the
+contents of the accumulator, and setting the divide-by-zero flag.
+
+0xA8 DIVJ
+
+The DIVJ instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. DIVJ will perform an integer division upon the
+word in the register specified by ARG1 and the word in the jump
+register, and place the resulting word in the accumulator.
+
+The DIVJ instruction will not be commutative---the order of division
+will be governed by which argument is used to specify the register. The
+register specified by ARG1 will supply the dividend, and the jump
+register will supply the divisor.
+
+Should the word contained in the jump register have a value of 0, no
+division will occur. In this case, the divide-by-zero flag will be set,
+and the accumulator will be populated with low bits.~
+
+The data in the accumulator will be overwritten by the DIVJ instruction.
+It will not affect the contents of any other register.
+
+The DIVJ instruction will be able to set the divide-by-zero flag. It
+will not be able to change any other flags. It will not be able to
+change the state of the machine in any way other than by changing the
+contents of the accumulator, and setting the divide-by-zero flag.
+
+Multiplication
+
+0xA9 MULT
+
+The MULT instruction will make use of ARG1 and ARG2 of the word. Any
+data in ARG3 will be ignored. MULT will perform an arithmetic
+multiplication of the words in the registers specified by ARG1 and ARG2,
+and place the resulting word in the accumulator.
+
+The MULT instruction will be commutative---the order in which the
+registers are specified will not affect the result.
+
+Should the product of the multiplication of the words in the registers
+defined by ARG1 and ARG2 be too large to contain in the accumulator, the
+overflow flag will be set and the accumulator will be loaded with the
+last 32 bits of the result. The excess leading bits will be truncated.
+
+The data in the accumulator will be overwritten by the MULT instruction.
+It will not affect the contents of any other register.
+
+The MULT instruction will be able to set the overflow flag. It will not
+be able to change any other flags. It will not be able to change the
+state of the machine in any way other than by changing the contents of
+the accumulator, and setting the overflow flag.
+
+0xAA MLTA
+
+The MLTA instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. MLTA will perform an arithmetic multiplication
+of the word in the register specified by ARG1 and the word in the
+accumulator, and place the resulting word in the accumulator.
+
+Should the product of the multiplication of the words in the register
+defined by ARG1 and the accumulator be too large to contain in the
+accumulator, the overflow flag will be set and the accumulator will be
+loaded with the last 32 bits of the result. The excess leading bits will
+be truncated.
+
+The data in the accumulator will be overwritten by the MLTA instruction.
+It will not affect the contents of any other register.
+
+The MLTA instruction will be able to set the overflow flag. It will not
+be able to change any other flags. It will not be able to change the
+state of the machine in any way other than by changing the contents of
+the accumulator, and setting the overflow flag.
+
+0XAB MLTJ
+
+The MLTJ instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. MLTJ will perform an arithmetic multiplication
+of the word in the register specified by ARG1 and the word in the jump
+register, and place the resulting word in the accumulator.
+
+Should the product of the multiplication of the words in the register
+defined by ARG1 and the jump register be too large to contain in the
+accumulator, the overflow flag will be set and the accumulator will be
+loaded with the last 32 bits of the result. The excess leading bits will
+be truncated.
+
+The data in the accumulator will be overwritten by the MLTJ instruction.
+It will not affect the contents of any other register.
+
+The MLTJ instruction will be able to set the overflow flag. It will not
+be able to change any other flags. It will not be able to change the
+state of the machine in any way other than by changing the contents of
+the accumulator, and setting the overflow flag.
+
+Binary Conjunction
+
+0X10 CJNT
+
+The CJNT instruction will make use of ARG1 and ARG2 of the word. Any
+data in ARG3 will be ignored. CJNT will perform a binary conjunction
+(bitwise and) operation upon the words in the registers defined by ARG1
+and ARG2, and place the resulting word in the accumulator.
+
+The CJNT instruction will be commutative---the order in which the
+registers are specified will not affect the result.
+
+The data in the accumulator will be overwritten by the CJNT instruction.
+It will not affect the contents of any other register.
+
+The CJNT instruction will not be able to set any flags. It will not
+affect the machine state in any way other than by changing the contents
+of the accumulator.
+
+0x11 CJNA
+
+The CJNA instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. CJNA will perform a binary conjunction (bitwise
+and) operation upon the word in the register defined by ARG1 and the
+word in the accumulator, and place the resulting word in the
+accumulator.
+
+The data in the accumulator will be overwritten by the CJNA instruction.
+It will not affect the contents of any other register.
+
+The CJNA instruction will not be able to set any flags. It will not
+affect the machine state in any way other than by changing the contents
+of the accumulator.
+
+0x12 CJNJ
+
+The CJNJ instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. CJNJ will perform a binary conjunction (bitwise
+and) operation upon the word in the register defined by ARG1 and the
+word in the jump register, and place the resulting word in the
+accumulator.
+
+The data in the accumulator will be overwritten by the CJNJ instruction.
+It will not affect the contents of any other register.
+
+The CJNJ instruction will not be able to set any flags. It will not
+affect the machine state in any way other than by changing the contents
+of the accumulator.
+
+Binary Disjunction
+
+0x13 DJNT
+
+The DJNT instruction will make use of ARG1 and ARG2 of the word. Any
+data in ARG3 will be ignored. DJNT will perform a binary disjunction
+(bitwise or) operation upon the words in the registers defined by ARG1
+and ARG2, and place the resulting word in the accumulator.
+
+The DJNT instruction will be commutative---the order in which the
+registers are specified will not affect the result.
+
+The data in the accumulator will be overwritten by the DJNT instruction.
+It will not affect the contents of any other register.
+
+The DJNT instruction will not be able to set any flags. It will not
+affect the machine state in any way other than by changing the contents
+of the accumulator.
+
+0x14 DJNA
+
+The DJNA instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. DJNA will perform a binary disjunction (bitwise
+or) operation upon the word in the register defined by ARG1 and the word
+in the accumulator, and place the resulting word in the accumulator.
+
+The data in the accumulator will be overwritten by the DJNA instruction.
+It will not affect the contents of any other register.
+
+The DJNA instruction will not be able to set any flags. It will not
+affect the machine state in any way other than by changing the contents
+of the accumulator.
+
+0x15 DJNJ
+
+The DJNJ instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. DJNJ will perform a binary disjunction (bitwise
+or) operation upon the word in the register defined by ARG1 and the word
+in the jump register, and place the resulting word in the accumulator.
+
+The data in the accumulator will be overwritten by the DJNJ instruction.
+It will not affect the contents of any other register.
+
+The DJNJ instruction will not be able to set any flags. It will not
+affect the machine state in any way other than by changing the contents
+of the accumulator.
+
+Binary Complement
+
+0x16 COMP
+
+The COMP instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. COMP will perform a binary complement (bitwise
+negation) upon the word in the register specified by ARG1, and place the
+resulting word in the accumulator.~
+
+The data in the accumulator will be overwritten by the COMP instruction.
+It will not affect any other register.
+
+The COMP instruction will not be able to set any flags. It will not
+affect the machine state in any way other than by changing the contents
+of the accumulator.
+
+0x17 CMPA
+
+The CMPA instruction will make use of no arguments of the word. Any data
+in ARG1, ARG2, or ARG3 will be ignored. CMPA will perform a binary
+complement (bitwise negation) upon the word in the accumulator and place
+the resulting word in the accumulator.
+
+The data in the accumulator will be overwritten by the CMPA instruction.
+It will not affect any other register.
+
+The CMPA instruction will not be able to set any flags. It will not
+affect the machine state in any way other than by changing the contents
+of the accumulator.
+
+0x18 CMPJ
+
+The CMPJ instruction will make use of no arguments of the word. Any data
+in ARG1, ARG2, or ARG3 will be ignored. CMPJ will perform a binary
+complement (bitwise negation) upon the word in the jump register and
+place the resulting word in the accumulator.
+
+The data in the accumulator will be overwritten by the CMPJ instruction.
+It will not affect any other register.
+
+The CMPJ instruction will not be able to set any flags. It will not
+affect the machine state in any way other than by changing the contents
+of the accumulator.
+
+Binary Shift
+
+0x19LSFT
+
+The LSFT instruction will make use of ARG1 and ARG2 of the word. Any
+data in ARG3 will be ignored. LSFT will perform a left bit-shift on the
+word contained in the register specified by ARG1 a number of times equal
+to the value of the word contained in the register specified by ARG2,
+and place the resulting word in the accumulator.
+
+The data in the accumulator will be overwritten by the LSFT instruction.
+It will not affect the contents of any other register.
+
+The LSFT instruction will not set any flags. It will not be able to
+change the machine state in any way other than by changing the contents
+of the accumulator.
+
+0x1A LSFA
+
+The LSFA instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. LSFA will perform a left bit-shift on the word
+contained in the register specified by ARG1 a number of times equal to
+the value of the word contained in the accumulator, and place the
+resulting word in the accumulator.
+
+The data in the accumulator will be overwritten by the LSFA instruction.
+It will not affect the contents of any other register.
+
+The LSFA instruction will not set any flags. It will not be able to
+change the machine state in any way other than by changing the contents
+of the accumulator.
+
+0x1B LSFJ
+
+The LSFJ instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. LSFJ will perform a left bit-shift on the word
+contained in the register specified by ARG1 a number of times equal to
+the value of the word contained in the jump register, and place the
+resulting word in the accumulator.
+
+The data in the accumulator will be overwritten by the LSFJ instruction.
+It will not affect the contents of any other register.
+
+The LSFJ instruction will not set any flags. It will not be able to
+change the machine state in any way other than by changing the contents
+of the accumulator.
+
+0x1C RSFT
+
+The RSFT instruction will make use of ARG1 and ARG2 of the word. Any
+data in ARG3 will be ignored. RSFT will perform a right bit-shift on the
+word contained in the register specified by ARG1 a number of times equal
+to the value of the word contained in the register specified by ARG2,
+and place the resulting word in the accumulator.
+
+The data in the accumulator will be overwritten by the RSFT instruction.
+It will not affect the contents of any other register.
+
+The RSFT instruction will not set any flags. It will not be able to
+change the machine state in any way other than by changing the contents
+of the accumulator.
+
+0x1D RSFA
+
+The RSFA instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. RSFA will perform a right bit-shift on the word
+contained in the register specified by ARG1 a number of times equal to
+the value of the word contained in the accumulator, and place the
+resulting word in the accumulator.
+
+The data in the accumulator will be overwritten by the RSFA instruction.
+It will not affect the contents of any other register.
+
+The RSFA instruction will not set any flags. It will not be able to
+change the machine state in any way other than by changing the contents
+of the accumulator.
+
+0x1E RSFJ
+
+The RSFJ instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. RSFJ will perform a right bit-shift on the word
+contained in the register specified by ARG1 a number of times equal to
+the value of the word contained in the jump register, and place the
+resulting word in the accumulator.
+
+The data in the accumulator will be overwritten by the RSFJ instruction.
+It will not affect the contents of any other register.
+
+The RSFJ instruction will not set any flags. It will not be able to
+change the machine state in any way other than by changing the contents
+of the accumulator.
+
+Modulus
+
+0xAC MOD
+
+The MOD instruction will make use of ARG1 and ARG2 of the word. Any data
+in ARG3 will be ignored. MOD will perform a modular division upon the
+two words in the registers specified by ARG1 and ARG2, and place the
+resulting word in the accumulator.
+
+The MOD instruction will not be commutative---the order of division will
+be governed by which argument is used to specify the register. The
+register specified by ARG1 will supply the dividend, and the register
+specified by ARG2 will supply the divisor.
+
+Should the word contained in the register defined by ARG2 have a value
+of 0, no division will occur. In this case, the divide-by-zero flag will
+be set, and the accumulator will be populated with low bits.~
+
+The data in the accumulator will be overwritten by the MOD instruction.
+It will not affect the contents of any other register.
+
+The MOD instruction will be able to set the divide-by-zero flag. It will
+not be able to change any other flags. It will not be able to change the
+state of the machine in any way other than by changing the contents of
+the accumulator, and setting the divide-by-zero flag.
+
+0xAD MODA
+
+The MODA instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. MODA will perform a modular division upon the
+word in the register specified by ARG1 and the word in the accumulator,
+and place the resulting word in the accumulator.
+
+The MODA instruction will not be commutative---the order of division
+will be governed by which argument is used to specify the register. The
+register specified by ARG1 will supply the dividend, and the accumulator
+will supply the divisor.
+
+Should the word contained in the accumulator have a value of 0, no
+division will occur. In this case, the divide-by-zero flag will be set,
+and the accumulator will be populated with low bits.~
+
+The data in the accumulator will be overwritten by the MODA instruction.
+It will not affect the contents of any other register.
+
+The MODA instruction will be able to set the divide-by-zero flag. It
+will not be able to change any other flags. It will not be able to
+change the state of the machine in any way other than by changing the
+contents of the accumulator, and setting the divide-by-zero flag.
+
+0xAE MODJ
+
+The MODJ instruction will make use of ARG1 of the word. Any data in ARG2
+or ARG3 will be ignored. MODJ will perform a modular division upon the
+word in the register specified by ARG1 and the word in the jump
+register, and place the resulting word in the accumulator.
+
+The MODJ instruction will not be commutative---the order of division
+will be governed by which argument is used to specify the register. The
+register specified by ARG1 will supply the dividend, and the jump
+register will supply the divisor.
+
+Should the word contained in the jump register have a value of 0, no
+division will occur. In this case, the divide-by-zero flag will be set,
+and the accumulator will be populated with low bits.~
+
+The data in the accumulator will be overwritten by the MODJ instruction.
+It will not affect the contents of any other register.
+
+The MODJ instruction will be able to set the divide-by-zero flag. It
+will not be able to change any other flags. It will not be able to
+change the state of the machine in any way other than by changing the
+contents of the accumulator, and setting the divide-by-zero flag.
+
+Program Control Instructions
+
+RBML contains many instructions dedicated to the process control of a
+program. These instructions allow for branches or calls to other regions
+of memory, as well as numeric comparisons. The comparison operations set
+the machine comparison flags, which can then be used by conditional
+branch or call instructions to allow for the creation of loops,
+branches, and conditional subroutine calls. The halting instructions can
+also be considered program control.
+
+Comparison Instructions
+
+0x20 CMP
+
+CMP will make use of ARG1 and ARG2 of the word. Any data in ARG3 will be
+ignored. CMP will compare the contents of the word in the register
+specified by ARG1 and the contents of the word in the register specified
+by ARG2 and update the comparison flags according to the following
+rules:
+
+\begin{itemize}
+\tightlist
+\item
+  If the content of the register specified by ARG1 is greater than the
+  contents of the register specified by ARG2, set the greater-than flag.
+\item
+  If the content of the register specified by ARG1 is equal to the
+  contents of the register specified by ARG2, set the equal-to flag.
+\item
+  If the content of the register specified by ARG1 is less than the
+  contents of the register specified by ARG2, set the less-than flag.
+\end{itemize}
+
+The CMP instruction will not alter the contents of any machine registers
+in any way.
+
+Before this instruction sets any of the comparison flags---it will unset
+them all. It will then set one, and only one, flag according to the
+rules listed above. It will not alter the machine state in any other
+way.
+
+0x21 CMPA
+
+CMPA will make use of ARG1 of the word. Any data in ARG2 or ARG3 will be
+ignored. CMPA will compare the contents of the word in the accumulator
+and the contents of the word in the register specified by ARG1 and
+update the comparison flags according to the following rules:
+
+\begin{itemize}
+\tightlist
+\item
+  If the content of the accumulator is greater than the contents of the
+  register specified by ARG1, set the greater-than flag.
+\item
+  If the content of the accumulator is equal to the contents of the
+  register specified by ARG1, set the equal-to flag.
+\item
+  If the content of the accumulator is less than the contents of the
+  register specified by ARG1, set the less-than flag.
+\end{itemize}
+
+The CMPA instruction will not alter the contents of any machine
+registers in any way.
+
+Before this instruction sets any of the comparison flags---it will unset
+them all. It will then set one, and only one, flag according to the
+rules listed above. It will not alter the machine state in any other
+way.
+
+0x22 CMPJ
+
+CMPJ will make use of ARG1 of the word. Any data in ARG2 or ARG3 will be
+ignored. CMPJ will compare the contents of the word in the accumulator
+and the contents of the word in the register specified by ARG1 and
+update the comparison flags according to the following rules:
+
+\begin{itemize}
+\tightlist
+\item
+  If the content of the jump register is greater than the contents of
+  the register specified by ARG1, set the greater-than flag.
+\item
+  If the content of the jump register is equal to the contents of the
+  register specified by ARG1, set the equal-to flag.
+\item
+  If the content of the jump register is less than the contents of the
+  register specified by ARG1, set the less-than flag.
+\end{itemize}
+
+The CMPJ instruction will not alter the contents of any machine
+registers in any way.
+
+Before this instruction sets any of the comparison flags---it will unset
+them all. It will then set one, and only one, flag according to the
+rules listed above. It will not alter the machine state in any other
+way.
+
+0x23 CMPM
+
+CMPM will make use of ARG1 and ARG3 of the word. Any data in ARG2 will
+be ignored. CMPM will compare the contents of the word in the register
+specified by ARG1 with the contents of the word in the region of memory
+specified by ARG3, and update the comparison flags according to the
+following rules:
+
+\begin{itemize}
+\tightlist
+\item
+  If the content of the register specified by ARG1 is greater than the
+  contents of region of memory specified by ARG3, set the greater-than
+  flag.
+\item
+  If the content of the register specified by ARG1 is equal to the
+  contents of region of memory specified by ARG3, set the equal-to flag.
+\item
+  If the content of the register specified by ARG1 is less than the
+  contents of region of memory specified by ARG3, set the less-than
+  flag.
+\end{itemize}
+
+The CMPM instruction will not alter the contents of any machine
+registers in any way.
+
+Before this instruction sets any of the comparison flags---it will unset
+them all. It will then set one, and only one, flag according to the
+rules listed above. It will not alter the machine state in any other
+way.
+
+Branch Instructions
+
+0x30 BRAN
+
+The BRAN instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. BRAN will set the instruction counter equal to
+the content of ARG3.
+
+The BRAN instruction will not set any flags, or alter the contents of
+any register. It will not alter the machine state in any way other than
+the adjustment of the instruction counter.
+
+0x31 BRGT
+
+The BRGT instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. BRGT will set the instruction counter equal to
+the content of ARG3, if and only if the greater-than flag is set.~
+
+The BRGT instruction will not set any flags, or alter the contents of
+any register. It will not alter the machine state in any way other than
+the adjustment of the instruction counter.
+
+0x32 BRLT
+
+The BRLT instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. BRLT will set the instruction counter equal to
+the content of ARG3, if and only if the less-than flag is set.~
+
+The BRLT instruction will not set any flags, or alter the contents of
+any register. It will not alter the machine state in any way other than
+the adjustment of the instruction counter.
+
+0x33 BREQ
+
+The BREQ instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. BREQ will set the instruction counter equal to
+the content of ARG3, if and only if the equal-to flag is set.~
+
+The BREQ instruction will not set any flags, or alter the contents of
+any register. It will not alter the machine state in any way other than
+the adjustment of the instruction counter.
+
+0x34 BRGE
+
+The BRGE instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. BRGE will set the instruction counter equal to
+the content of ARG3, if and only if the greater-than flag is set, or the
+equal to flag is set.~
+
+The BRGE instruction will not set any flags, or alter the contents of
+any register. It will not alter the machine state in any way other than
+the adjustment of the instruction counter.
+
+0x35 BRLE
+
+The BRLE instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. BRLE will set the instruction counter equal to
+the content of ARG3, if and only if the less-than flag is set, or the
+equal to flag is set.~
+
+The BRLE instruction will not set any flags, or alter the contents of
+any register. It will not alter the machine state in any way other than
+the adjustment of the instruction counter
+
+0x36 BRER
+
+The BRER instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. BRER will set the instruction counter equal to
+the content of ARG3, if and only if the machine overflow flag, machine
+divide-by-zero flag, or the machine IO error flag is set.
+
+The BRER instruction will not set any flags, or alter the contents of
+any register. It will not alter the machine state in any way other than
+the adjustment of the instruction counter
+
+0x37 BROF
+
+The BROF instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. BROF will set the instruction counter equal to
+the content of ARG3, if and only if the machine overflow flag is set.~
+
+The BROF instruction will not set any flags, or alter the contents of
+any register. It will not alter the machine state in any way other than
+the adjustment of the instruction counter
+
+0x38 BRIO
+
+The BRIO instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. BRIO will set the instruction counter equal to
+the content of ARG3, if and only if the machine IO error flag is set.~
+
+The BRIO instruction will not set any flags, or alter the contents of
+any register. It will not alter the machine state in any way other than
+the adjustment of the instruction counter
+
+0x39 BRDZ
+
+The BRDZ instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. BRDZ will set the instruction counter equal to
+the content of ARG3, if and only if the machine divide-by-zero flag is
+set.~
+
+The BRDZ instruction will not set any flags, or alter the contents of
+any register. It will not alter the machine state in any way other than
+the adjustment of the instruction counter
+
+Call Instructions
+
+0x40 CALL
+
+The CALL instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. CALL will set the jump register equal to the
+instruction counter. If the jump register contains anything other than
+high bits, it will first push the current value of the jump register to
+the top of the call stack. Once the jump register contains the value of
+the instruction counter, the instruction counter will be overwritten to
+contain the content of ARG3.
+
+The CALL instruction will not set any flags, nor alter the contents of
+any register other than the jump register. It will not alter the machine
+state in any way other than the adjustment of the instruction counter,
+jump register, and pushing words to the call stack.
+
+0x41 CAGT
+
+The CAGT instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. If and only if the greater-than flag is set,
+CAGT will set the jump register equal to the instruction counter. If the
+jump register contains anything other than high bits, it will first push
+the current value of the jump register to the top of the call stack.
+Once the jump register contains the value of the instruction counter,
+the instruction counter will be overwritten to contain the content of
+ARG3.
+
+The CAGT instruction will not set any flags, nor alter the contents of
+any register other than the jump register. It will not alter the machine
+state in any way other than the adjustment of the instruction counter,
+jump register, and pushing words to the call stack.
+
+0x42 CALT
+
+The CALT instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. If and only if the less-than flag is set, CALT
+will set the jump register equal to the instruction counter. If the jump
+register contains anything other than high bits, it will first push the
+current value of the jump register to the top of the call stack. Once
+the jump register contains the value of the instruction counter, the
+instruction counter will be overwritten to contain the content of ARG3.
+
+The CALT instruction will not set any flags, nor alter the contents of
+any register other than the jump register. It will not alter the machine
+state in any way other than the adjustment of the instruction counter,
+jump register, and pushing words to the call stack.
+
+0x43 CAEQ
+
+The CAEQ instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. If and only if the equal-to flag is set, CAEQ
+will set the jump register equal to the instruction counter. If the jump
+register contains anything other than high bits, it will first push the
+current value of the jump register to the top of the call stack. Once
+the jump register contains the value of the instruction counter, the
+instruction counter will be overwritten to contain the content of ARG3.
+
+The CAEQ instruction will not set any flags, nor alter the contents of
+any register other than the jump register. It will not alter the machine
+state in any way other than the adjustment of the instruction counter,
+jump register, and pushing words to the call stack.
+
+0x44 CAGE
+
+The CAGE instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. If and only if the greater-than flag or the
+equal-to flag is set, CAGE will set the jump register equal to the
+instruction counter. If the jump register contains anything other than
+high bits, it will first push the current value of the jump register to
+the top of the call stack. Once the jump register contains the value of
+the instruction counter, the instruction counter will be overwritten to
+contain the content of ARG3.
+
+The CAGE instruction will not set any flags, nor alter the contents of
+any register other than the jump register. It will not alter the machine
+state in any way other than the adjustment of the instruction counter,
+jump register, and pushing words to the call stack.
+
+0x45 CALE
+
+The CALE instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. If and only if the less-than flag or the equal
+to flag is set, CALE will set the jump register equal to the instruction
+counter. If the jump register contains anything other than high bits, it
+will first push the current value of the jump register to the top of the
+call stack. Once the jump register contains the value of the instruction
+counter, the instruction counter will be overwritten to contain the
+content of ARG3.
+
+The CALE instruction will not set any flags, nor alter the contents of
+any register other than the jump register. It will not alter the machine
+state in any way other than the adjustment of the instruction counter,
+jump register, and pushing words to the call stack.
+
+0x46 CAER
+
+The CAER instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. If and only if the machine overflow, machine
+divide-by-zero, or the machine IO error flag is set, CAER will set the
+jump register equal to the instruction counter. If the jump register
+contains anything other than high bits, it will first push the current
+value of the jump register to the top of the call stack. Once the jump
+register contains the value of the instruction counter, the instruction
+counter will be overwritten to contain the content of ARG3.
+
+The CAER instruction will not set any flags, nor alter the contents of
+any register other than the jump register. It will not alter the machine
+state in any way other than the adjustment of the instruction counter,
+jump register, and pushing words to the call stack.
+
+0x47 CAOF
+
+The CAOF instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. If and only if the machine overflow flag is
+set, CAOF will set the jump register equal to the instruction counter.
+If the jump register contains anything other than high bits, it will
+first push the current value of the jump register to the top of the call
+stack. Once the jump register contains the value of the instruction
+counter, the instruction counter will be overwritten to contain the
+content of ARG3.
+
+The CAOF instruction will not set any flags, nor alter the contents of
+any register other than the jump register. It will not alter the machine
+state in any way other than the adjustment of the instruction counter,
+jump register, and pushing words to the call stack.
+
+0x48 CAIO
+
+The CAIO instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. If and only if the machine IO error flag is
+set, CAIO will set the jump register equal to the instruction counter.
+If the jump register contains anything other than high bits, it will
+first push the current value of the jump register to the top of the call
+stack. Once the jump register contains the value of the instruction
+counter, the instruction counter will be overwritten to contain the
+content of ARG3.
+
+The CAIO instruction will not set any flags, nor alter the contents of
+any register other than the jump register. It will not alter the machine
+state in any way other than the adjustment of the instruction counter,
+jump register, and pushing words to the call stack.
+
+0x49 CADZ
+
+The CADZ instruction will make use of ARG3 of the word. Any data in ARG1
+or ARG2 will be ignored. If and only if the machine divide-by-zero flag
+is set, CADZ will set the jump register equal to the instruction
+counter. If the jump register contains anything other than high bits, it
+will first push the current value of the jump register to the top of the
+call stack. Once the jump register contains the value of the instruction
+counter, the instruction counter will be overwritten to contain the
+content of ARG3.
+
+The CADZ instruction will not set any flags, nor alter the contents of
+any register other than the jump register. It will not alter the machine
+state in any way other than the adjustment of the instruction counter,
+jump register, and pushing words to the call stack.
+
+0x4F END
+
+The END instruction will not make use of any arguments of the word. Any
+data in ARG1, ARG2, or ARG3 will be ignored. END will set the
+instruction counter equal to the contents of the jump register, and then
+pop the top word from the call stack and place it into the jump
+register. If the call stack is empty, END will populate the jump
+register with high bits.
+
+The END instruction will not set any flags, nor alter the contents of
+any register other than the jump register. It will not alter the machine
+state in any way other than the adjustment of the instruction counter,
+jump register, and popping words from the call stack.
+
+Halting Instructions
+
+0xFF HALT
+
+The HALT instruction will not make use of any argument of the word. Any
+data in ARG1, ARG2, or ARG3 will be ignored. HALT will case an immediate
+end to machine execution.
+
+0xEE HERR
+
+The HERR instruction will not make use of any argument of the word. Any
+data in ARG1, ARG2, or ARG3 will be ignored. HERR will cause an
+immediate end to machine execution, and initiate a dump of all details
+of the machine state to an error file, and to the display.
+
+\end{document}
